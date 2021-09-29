@@ -1,7 +1,8 @@
+from src.app.mentoria import UnidesMentoria
 from src.providers.db import DbUnides
 from discord.ext import commands
-from dotenv import load_dotenv
 from src.app.bot import Unides
+from dotenv import load_dotenv
 import discord
 import os
 
@@ -17,5 +18,8 @@ if __name__ == "__main__":
     db = DbUnides()
 
     client = commands.Bot(command_prefix="!", intents=intents)
+
     client.add_cog(Unides(client, server, db))
+    client.add_cog(UnidesMentoria(client, server, db))
+
     client.run(token)

@@ -1,7 +1,11 @@
+from email.message import EmailMessage
+from email.utils import formataddr
+from email.header import Header
 from dotenv import load_dotenv
 import smtplib, ssl
 import csv
 import os
+
 
 load_dotenv()
 
@@ -51,7 +55,7 @@ class Mail:
             print(e)
 
 
-    def send_mail(self, to: str, email: str):
+    def send_mail(self, to: str, email: str, subject: str):
         try:
             if self.port == 465:
                 self.__mail_ssl()
@@ -60,7 +64,17 @@ class Mail:
                 self.__mail_starttls()
 
             print(f"Enviando email para {to}")
-            self.server.sendmail(self.mail, to, email)
 
-        except Exception:
+            msg = EmailMessage()
+            msg['From'] = formataddr((str(Header('Unides', 'utf-8')), self.mail))
+            msg['Subject'] = subject
+            msg['To'] = to
+            msg.set_content(email)
+
+            self.server.send_message(msg)
+
+            print(f"Enviando com sucesso")
+
+        except Exception as e:
+            print(e)
             print('Error to send email')

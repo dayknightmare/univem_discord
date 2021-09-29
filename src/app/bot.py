@@ -1,5 +1,6 @@
 from src.helpers.mail import open_mail_file 
 from src.providers.db import DbUnides
+from src.helpers.user import UserDB
 from discord.ext import commands
 import discord
 import json
@@ -10,17 +11,15 @@ class Unides(commands.Cog):
     def __init__(self, client, server: str, db: DbUnides):
         self.client = client
         self.server = server
-        self.db = db
+        self.db = UserDB(db)
         self.no_roles = ['unidis', '@everyone', '@here']
         self.mails = open_mail_file()
 
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f'{self.client.user} has connected to Discord!')
-
+        print(f"{self.client.user} está pronto para ser usado")
         guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
-        print(self.db.get_all_user())
 
         for i in guild.members:
             if not self.db.get_user(i.id):

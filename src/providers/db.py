@@ -1,4 +1,3 @@
-from typing import Union
 import sqlite3
 import os
 
@@ -44,6 +43,20 @@ class DbUnides:
             """
         )
 
+        cursor.execute(
+            """
+                CREATE TABLE agendamento (
+                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    requisitante TEXT,
+                    mentor TEXT,
+                    mentor_email TEXT,
+                    data_dia DATE,
+                    data_hora_inicio DATETIME,
+                    data_hora_fim DATETIME
+                )
+            """
+        )
+
         self.commit()
         cursor.close()
 
@@ -51,72 +64,3 @@ class DbUnides:
     def commit(self):
         self.db.commit()
         
-
-    def add_user(self, name: str, discord_id: str, roles: str):
-        cursor = self.open_cursor()
-        cursor.execute(
-            f"""
-                INSERT INTO users (name, discord_id, roles) VALUES (?, ?, ?)
-            """,
-            [name, discord_id, roles]
-        )
-
-        self.commit()
-        cursor.close()
-
-
-    def get_user(self, discord_id: str) -> Union[dict, None]:
-        cursor = self.open_cursor()
-        cursor.execute(
-            f"""
-                SELECT * FROM users WHERE discord_id = ? LIMIT 1
-            """,
-            [discord_id]
-        )
-
-        user = cursor.fetchone()
-        cursor.close()
-
-        return user
-
-
-    def get_user_by_email(self, email: str) -> Union[dict, None]:
-        cursor = self.open_cursor()
-        cursor.execute(
-            f"""
-                SELECT * FROM users WHERE email = ? LIMIT 1
-            """,
-            [email]
-        )
-
-        user = cursor.fetchone()
-        cursor.close()
-
-        return user
-
-
-    def get_all_user(self) -> list:
-        cursor = self.open_cursor()
-        cursor.execute(
-            f"""
-                SELECT * FROM users
-            """,
-        )
-
-        user = cursor.fetchall()
-        cursor.close()
-
-        return user or []
-
-
-    def change_user(self, discord_id: str, roles: str, email: str):
-        cursor = self.open_cursor()
-        cursor.execute(
-            f"""
-                UPDATE users SET roles = ?, email = ? WHERE discord_id = ?
-            """,
-            [roles, email, discord_id]
-        )
-
-        self.commit()
-        cursor.close()
