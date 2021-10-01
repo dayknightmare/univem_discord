@@ -1,4 +1,5 @@
 from src.app.mentoria import UnidesMentoria
+from src.app.equipe import UnidesEquipe
 from src.providers.db import DbUnides
 from discord.ext import commands
 from src.app.bot import Unides
@@ -21,5 +22,6 @@ if __name__ == "__main__":
 
     client.add_cog(Unides(client, server, db))
     client.add_cog(UnidesMentoria(client, server, db))
+    client.add_cog(UnidesEquipe(client, server, db))
 
     client.run(token)
