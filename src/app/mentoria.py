@@ -79,7 +79,7 @@ class UnidesMentoria(commands.Cog):
         Thread(target=self.mail.send_mail, args=[
             mentor['email'], 
             f"""
-            {context.message.author.name} e sua equipe pediu uma mentoria as {ag[1]} no hackthon da NASA, quando chegar a hora converse com {context.message.author.name} numa sala do Discord (#mentor-0{mentor['id']}).
+            {context.message.author.name} e sua equipe pediu uma mentoria as {ag[1]} no hackthon da NASA, quando chegar a hora converse com {context.message.author.name} numa sala do Discord.
 
             Qualquer dúvida contacte o @suporte para mais informações
             """, 
@@ -138,7 +138,7 @@ class UnidesMentoria(commands.Cog):
                 Thread(target=self.mail.send_mail, args=[
                     mentor['email'], 
                     f"""
-                    {context.message.author.name} cancelou a mentoria que seria realizado as {i['data_hora_inicio']} no canal #mentor-0{mentor['id']}
+                    {context.message.author.name} cancelou a mentoria que seria realizado as {i['data_hora_inicio']} no canal
 
                     Qualquer dúvida contacte o @suporte para mais informações
                     """, 

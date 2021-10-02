@@ -15,6 +15,9 @@ class UnidesEquipe(commands.Cog):
         self.server = server
         self.db = EquipeDB(db)
 
+        for i in self.client.guilds:
+            print(i) 
+
     
     @commands.command(name='perfil', help="Atribui um perfil ao participante.", pass_context=True)
     async def perfil(self, context: discord.ext.commands.context.Context, perfil: str = ""):
