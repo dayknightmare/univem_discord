@@ -1,7 +1,12 @@
 from src.helpers.equipe import EquipeDB
 from src.providers.db import DbUnides
 from discord.ext import commands
+from dotenv import load_dotenv
+import datetime
 import discord
+import os
+
+load_dotenv()
 
 
 class UnidesEquipe(commands.Cog):
@@ -54,6 +59,12 @@ class UnidesEquipe(commands.Cog):
 
         if not guild:
             return
+
+        date = datetime.datetime(2021, 10, 2, 10, 0, 0, 0)
+        now = datetime.datetime.now() + datetime.timedelta(hours=int(os.getenv("HORA_GTM")))
+
+        if now < date:
+            return 
 
         role_par: discord.Role = discord.utils.get(guild.roles, name='PARTICIPANTES')
         role_fac: discord.Role = discord.utils.get(guild.roles, name='FACILITADORES')

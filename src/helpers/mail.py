@@ -6,8 +6,8 @@ import smtplib, ssl
 import csv
 import os
 
-
 load_dotenv()
+
 
 def open_mail_file() -> list:
     mails = []
