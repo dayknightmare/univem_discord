@@ -72,6 +72,9 @@ class AgendamentoDB:
             cursor.close()
             return None
 
+        if hora_str not in mentor[key]:
+            return -1
+
         final_time = datetime.strptime(f"{data_str} {hora_str}", "%Y-%m-%d %H:%M")
         final_time += timedelta(minutes=30)
 
