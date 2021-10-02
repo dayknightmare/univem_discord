@@ -55,6 +55,14 @@ class UnidesEquipe(commands.Cog):
         if not guild:
             return
 
+        role_par: discord.Role = discord.utils.get(guild.roles, name='PARTICIPANTES')
+        role_fac: discord.Role = discord.utils.get(guild.roles, name='FACILITADORES')
+        role_men: discord.Role = discord.utils.get(guild.roles, name='MENTORES')
+        user: discord.Member = discord.utils.get(guild.members, id=context.message.author.id)
+
+        if role_par not in user.roles:
+            return
+
         id = self.db.create_equipe(str(context.author.id))
         
         await guild.create_role(name=f"equipe-0{id}")
@@ -66,10 +74,17 @@ class UnidesEquipe(commands.Cog):
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
             user: discord.PermissionOverwrite(read_messages=True),
-            role: discord.PermissionOverwrite(read_messages=True)
+            role: discord.PermissionOverwrite(read_messages=True),
+            role_men: discord.PermissionOverwrite(read_messages=True),
+            role_par: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+            role_fac: discord.PermissionOverwrite(read_messages=True),
         }
 
-        channel = await guild.create_text_channel(f"equipe-0{id}", overwrites=overwrites)
+        cat = await guild.create_category(f"EQUIPE-0{id}")
+
+        channel = await guild.create_text_channel(f"equipe-0{id}", overwrites=overwrites, category=cat)
+        channel_voice = await guild.create_voice_channel(f"voz-equipe-0{id}", overwrites=overwrites, category=cat)
+
         link = await channel.create_invite(max_uses=1, unique=True)
 
         await user.send(f"Link de acesso para #equipe-0{id}")
@@ -77,7 +92,18 @@ class UnidesEquipe(commands.Cog):
 
     
     @commands.command(name='add', help="Adiciona membro ao canal de equipe", pass_context=True)
-    async def criaequipe(self, context: discord.ext.commands.context.Context, member: discord.Member):
+    async def add_member(self, context: discord.ext.commands.context.Context, member: discord.Member):
+        guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
+
+        if not guild:
+            return
+
+        role: discord.Role = discord.utils.get(guild.roles, name='PARTICIPANTES')
+        user: discord.Member = discord.utils.get(guild.members, id=context.message.author.id)
+
+        if role not in user.roles:
+            return
+
         if not isinstance(context.channel, discord.channel.TextChannel):
             await context.send("Comando válido apenas em canais")
             return
@@ -90,13 +116,7 @@ class UnidesEquipe(commands.Cog):
             await context.send("Membro não encontrado")
             return
 
-        guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
-
-        if not guild:
-            return
-
         role: discord.Role = discord.utils.get(guild.roles, name=context.channel.name)
-
         link = await context.channel.create_invite(max_uses=1, unique=True, )
 
         await member.send(f"Link de acesso para #{context.channel.name}")

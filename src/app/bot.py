@@ -102,6 +102,8 @@ class Unides(commands.Cog):
                 json.dumps(list(set([*['PARTICIPANTES'], *[i.name for i in user.roles]]))), 
                 email
             )
+            await context.send(f"Se você for o lider da equipe use o comando !criaequipe para gerar a sua equipe")
+            await context.send(f"Após isso adicione seus amigos com o comando !add @membro")
 
         else:
             await context.send(f"Seu email não foi encontrado, entre em contato com o suporte do evento")
