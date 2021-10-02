@@ -1,8 +1,13 @@
 from datetime import datetime, timedelta, time
 from src.providers.db import DbUnides
+from dotenv import load_dotenv
 from typing import Union
 import time
 import csv
+import ast
+import os
+
+load_dotenv()
 
 
 def round_hour(time: datetime) -> datetime:
@@ -21,11 +26,20 @@ class AgendamentoDB:
     
     def get_next_time_agendamento(self, mentor: dict) -> Union[list, None, int]:
         cursor = self.db.open_cursor()
-        now = round_hour(datetime.now())
+        now = round_hour(datetime.now() + timedelta(hours=int(os.getenv("HORA_GTM"))))
         hora_str = now.strftime("%H:%M")
         hora = time.strptime(hora_str, "%H:%M")
         data_str = now.strftime("%Y-%m-%d")
-        hora_min = time.strptime(mentor['hora'], "%H:%M")
+        
+        key = "hora_domingo"
+
+        if data_str == "2021-10-02":
+            key = "hora_sabado"
+
+        if len(mentor[key]) == 0:
+            return -1 
+        
+        hora_min = time.strptime(mentor[key][0], "%H:%M")
 
         if hora_min > hora:
             cursor.close()
@@ -33,18 +47,23 @@ class AgendamentoDB:
 
         cursor.execute(
             """
-            SELECT * FROM agendamento WHERE data_dia = ? AND mentor = ?
+            SELECT * FROM agendamento WHERE data_dia = ? AND mentor = ? AND data_hora_inicio >= ?
             """, 
-            [now.strftime("%Y-%m-%d"), mentor['id']]
+            [now.strftime("%Y-%m-%d"), mentor['id'], hora_str]
         )
 
         aulas = cursor.fetchall()
 
+        print(hora_str)
+
         for i in aulas:
-            if i['data_hora_inicio'] == hora_str or time.strptime(i['data_hora_fim'], "%H:%M") > hora:
-                t = time.strptime(i['data_hora_fim'], "%H:%M")
-                hora_str = time.strftime("%H:%M", t)
+            ts = time.strptime(i['data_hora_fim'], "%H:%M")
+
+            if i['data_hora_inicio'] == hora_str or ts > hora or time.strftime("%H:%M", ts) not in mentor[key]:
+                hora_str = time.strftime("%H:%M", ts)
                 hora = time.strptime(hora_str, "%H:%M")
+
+                print(hora_str)
 
             else:
                 break
@@ -57,9 +76,6 @@ class AgendamentoDB:
         final_time += timedelta(minutes=30)
 
         cursor.close()
-
-        if time.strptime(final_time.strftime("%H:%M"), "%H:%M") > time.strptime(mentor['hora_fim'], "%H:%M"):
-            return -1
 
         return [now.strftime("%d"), hora_str, final_time.strftime("%H:%M"), now.strftime("%Y-%m-%d")]
 
@@ -94,7 +110,7 @@ class AgendamentoDB:
     def agendamentos(self, user: str) -> list:
         cursor = self.db.open_cursor()
 
-        now = round_hour(datetime.now())
+        now = round_hour(datetime.now() + timedelta(hours=int(os.getenv("HORA_GTM"))))
         data_str = now.strftime("%Y-%m-%d")
         hora_str = now.strftime("%H:%M")
 
@@ -141,8 +157,8 @@ def open_mentores_file() -> list:
             mentores.append({
                 'name': i[0],
                 'email': i[1],
-                'hora': i[2],
-                'hora_fim': i[3],
+                'hora_sabado': ast.literal_eval(i[2]),
+                'hora_domingo': ast.literal_eval(i[3]),
                 'desc': i[4],
                 'id': c
             })

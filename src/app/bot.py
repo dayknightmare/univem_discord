@@ -56,25 +56,17 @@ class Unides(commands.Cog):
             return
 
         await member.send('Seja bem vindo ao server do Univem para hackathon da NASA')
-        await member.send("Primeiramente gostaria que de validar sua inscrição, bem simples")
+        await member.send("Primeiramente gostaria de validar sua inscrição, bem simples")
         await member.send("Use o comando !auth <email>, com isso iremos validar e te autorizar para seus canais")
-
-
-    @commands.command(name='roles', help="Traz todos os cargos disponível neste server")
-    async def roles(self, context: discord.ext.commands.context.Context):
-        if isinstance(context.channel, discord.channel.DMChannel):
-            return
-
-        await context.send("Temos estes cargos a disposição:")
-        for i in context.guild.roles:
-            if i.name in self.no_roles:
-                continue
-
-            await context.send(f"@{i.name}")
-
+        
 
     @commands.command(name='auth', help="Faz a autenticação no server como membro", pass_context=True)
-    async def roles(self, context: discord.ext.commands.context.Context, email: str = ''):
+    async def auth(self, context: discord.ext.commands.context.Context, email: str = ''):
+        guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
+
+        if not guild:
+            return
+
         if not isinstance(context.channel, discord.channel.DMChannel):
             await context.send(f"{context.message.author.name} Vamos fazer isso no privado, para proteger sua privacidade ta bom!")
             return

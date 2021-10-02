@@ -11,8 +11,7 @@ class DbUnides:
         self.db = sqlite3.connect('./database.sqlite3')
         self.db.row_factory = self.dict_cursor
 
-        if not exists:
-            self.__create_tables()
+        self.__create_tables()
 
 
     def dict_cursor(self, cursor: sqlite3.Cursor, row) -> dict:
@@ -33,7 +32,7 @@ class DbUnides:
         cursor = self.open_cursor()
         cursor.execute(
             """
-                CREATE TABLE users (
+                CREATE TABLE IF NOT EXISTS users (
                     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                     name TEXT,
                     email TEXT,
@@ -45,7 +44,7 @@ class DbUnides:
 
         cursor.execute(
             """
-                CREATE TABLE agendamento (
+                CREATE TABLE IF NOT EXISTS agendamento (
                     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                     requisitante TEXT,
                     mentor TEXT,
@@ -53,6 +52,15 @@ class DbUnides:
                     data_dia DATE,
                     data_hora_inicio DATETIME,
                     data_hora_fim DATETIME
+                )
+            """
+        )
+
+        cursor.execute(
+            """
+                CREATE TABLE IF NOT EXISTS equipe (
+                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    criador TEXT
                 )
             """
         )

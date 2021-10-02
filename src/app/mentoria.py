@@ -17,12 +17,17 @@ class UnidesMentoria(commands.Cog):
     
     @commands.command(name='mentoria', help="Traz todos os mentores e seus possivéis horários")
     async def mentoria(self, context: discord.ext.commands.context.Context):
+        guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
+
+        if not guild:
+            return
+
         await context.send("Mentores disponíveis:")
 
         for i in self.mentores:
             horario = self.db.get_next_time_agendamento(i)
 
-            embedVar = discord.Embed(title=f"{i['name']} | #{i['id']}", description=f"{i['hora']} até {i['hora_fim']}\n", color=0x00ff00)
+            embedVar = discord.Embed(title=f"{i['name']} | #{i['id']}", description=f"\n", color=0x00ff00)
             embedVar.add_field(name="Skills", value=i['desc'], inline=False)
 
             if horario == -1 or horario == None:
@@ -39,6 +44,11 @@ class UnidesMentoria(commands.Cog):
 
     @commands.command(name='agendar', help="Realiza o agendamento com um mentor para isso passe o #id para que possamos marcar", pass_context=True)
     async def agendar(self, context: discord.ext.commands.context.Context, id: str = ""):
+        guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
+
+        if not guild:
+            return
+
         if id == "" or not id.startswith("#"):
             await context.send("ID inválido, exemplo de um ID válido: #1")
             return
@@ -62,7 +72,7 @@ class UnidesMentoria(commands.Cog):
             return
 
         if ag == -1:
-            await context.send(f"Neste horário o mentor não faz mentorias, apenas entre {mentor['hora']} e {mentor['hora_fim']}")
+            await context.send(f"Neste horário o mentor não faz mentorias")
             return
 
         self.db.agendar(ag[3], ag[1], ag[2], mentor, str(context.message.author.id))
@@ -81,6 +91,11 @@ class UnidesMentoria(commands.Cog):
 
     @commands.command(name='agendamentos', help="Lista todos os agendamentos marcados por você")
     async def agendamentos(self, context: discord.ext.commands.context.Context):
+        guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
+
+        if not guild:
+            return
+
         ags = self.db.agendamentos(str(context.message.author.id))
 
         if len(ags) == 0:
@@ -97,6 +112,11 @@ class UnidesMentoria(commands.Cog):
 
     @commands.command(name='cancelar', help="Cancela uma mentoria marcada por você, para isso passe o #id da mentoria")
     async def cancelar(self, context: discord.ext.commands.context.Context, id: str):
+        guild: discord.Guild = discord.utils.get(self.client.guilds, name=self.server)
+
+        if not guild:
+            return
+
         if id == "" or not id.startswith("#"):
             await context.send("ID inválido, exemplo de um ID válido: #1")
             return
